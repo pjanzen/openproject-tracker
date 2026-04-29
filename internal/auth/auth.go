@@ -16,6 +16,11 @@ import (
 // ErrLoginTimeout is returned when SSO login does not complete in time.
 var ErrLoginTimeout = errors.New("SSO login timed out")
 
+const (
+	loginPollInterval = 2 * time.Second
+	loginTimeout      = 5 * time.Minute
+)
+
 // Login opens a headful Chromium window and waits for the user to complete SSO.
 // It polls /api/v3/my_preferences until it returns 200, then exports cookies.
 func Login(cfg *config.Config, jar *PersistentJar) error {
@@ -49,9 +54,9 @@ func Login(cfg *config.Config, jar *PersistentJar) error {
 		return fmt.Errorf("navigate to base URL: %w", err)
 	}
 
-	ticker := time.NewTicker(2 * time.Second)
+	ticker := time.NewTicker(loginPollInterval)
 	defer ticker.Stop()
-	timeout := time.After(5 * time.Minute)
+	timeout := time.After(loginTimeout)
 
 	prefsURL := cfg.BaseURL + "/api/v3/my_preferences"
 

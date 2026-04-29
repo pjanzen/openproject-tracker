@@ -224,7 +224,7 @@ func (s *appState) onStop() {
 	elapsed := time.Since(s.startTime)
 	hours := elapsed.Hours()
 
-	spentOn := s.startTime.Format("2006-01-02")
+	spentOn := s.startTime.Format(time.DateOnly)
 	te := client.TimeEntry{
 		WorkPackageID: s.selectedWP.ID,
 		ActivityID:    s.selectedActivity.ID,

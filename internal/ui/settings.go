@@ -81,8 +81,5 @@ func parseHeaders(text string) map[string]string {
 			result[k] = v
 		}
 	}
-	if len(result) == 0 {
-		return nil
-	}
 	return result
 }

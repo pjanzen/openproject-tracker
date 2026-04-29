@@ -216,6 +216,9 @@ func (c *Client) get(path string) (*http.Response, error) {
 	return resp, nil
 }
 
+// ssoRedirectPatterns are substrings used to detect SSO redirect responses.
+var ssoRedirectPatterns = []string{"outpost.goauthentik.io", "authentik"}
+
 // checkResponse returns ErrUnauthorized for 401 or SSO redirects, otherwise nil.
 func (c *Client) checkResponse(resp *http.Response) error {
 	if resp.StatusCode == http.StatusUnauthorized {
@@ -223,8 +226,10 @@ func (c *Client) checkResponse(resp *http.Response) error {
 	}
 	if resp.StatusCode == http.StatusFound || resp.StatusCode == http.StatusMovedPermanently {
 		loc := resp.Header.Get("Location")
-		if strings.Contains(loc, "outpost.goauthentik.io") || strings.Contains(loc, "authentik") {
-			return ErrUnauthorized
+		for _, pattern := range ssoRedirectPatterns {
+			if strings.Contains(loc, pattern) {
+				return ErrUnauthorized
+			}
 		}
 	}
 	return nil
